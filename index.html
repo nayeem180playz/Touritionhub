@@ -403,4 +403,109 @@
             }
             else if (screenId === 'membersScreen') { const container = document.getElementById('membersListContainer'); if(container) state.listeners[screenId] = services.listenToList('users', users => { container.innerHTML = users.map(u => ui.userListItem(u).outerHTML).join(''); }); }
             else if (screenId === 'squadScreen') { const container = document.getElementById('squadListContainer'); if(container) state.listeners[screenId] = services.listenToList('squads', squads => { container.innerHTML = squads.map(ui.squadListItem).join(''); }); }
-            else if (screenId === 'mySquadScr
+            else if (screenId === 'mySquadScreen') {
+                const { squadId } = state.currentUserData;
+                if(squadId) {
+                    document.getElementById('squadDetailsView').classList.remove('hidden'); document.getElementById('noSquadView').classList.add('hidden');
+                    state.listeners[screenId] = services.listenToSquadDetails(squadId, (squadData) => { 
+                        if(squadData) { 
+                            const isCurrentUserAdmin = state.currentUser.uid === squadData.adminId;
+                            let actionsHtml = `<button class="squad-chat-btn w-full py-3 rounded-lg bg-cyan-500 font-semibold">Private Chat</button>`;
+                            if (isCurrentUserAdmin) { actionsHtml += `<button id="inviteSquadBtn" class="w-full py-3 rounded-lg bg-blue-500 font-semibold">Invite Members</button><button class="delete-squad-btn w-full py-3 rounded-lg bg-danger font-semibold" data-squad-id="${squadData.id}" data-member-ids='${JSON.stringify(squadData.members)}'>Delete Squad</button>`; } else { actionsHtml += `<button class="leave-squad-btn w-full py-3 rounded-lg bg-warning font-semibold" data-squad-id="${squadData.id}">Exit Squad</button>`; }
+                            document.getElementById('squadActionsContainer').innerHTML = actionsHtml;
+                            document.getElementById('mySquadName').textContent = squadData.name; document.getElementById('mySquadBio').textContent = squadData.bio; document.getElementById('mySquadLogo').src = squadData.logoURL; document.getElementById('squadMemberCount').textContent = `Members: ${squadData.members.length}/5`; 
+                            document.getElementById('mySquadMembersContainer').innerHTML = squadData.memberDetails.map(m => ui.squadMemberListItem(m, squadData.adminId)).join(''); 
+                        } else { this.refreshCurrentScreen(); }
+                    });
+                } else { document.getElementById('squadDetailsView').classList.add('hidden'); document.getElementById('noSquadView').classList.remove('hidden'); }
+            }
+            else if (screenId === 'duoPartnerScreen') {
+                const { partnerId } = state.currentUserData;
+                if(partnerId) {
+                     document.getElementById('partnerDetailsView').classList.remove('hidden'); document.getElementById('noPartnerView').classList.add('hidden');
+                     state.listeners[screenId] = services.listenToPartnerDetails(partnerId, (partnerData) => { 
+                         if(partnerData && partnerData.partnerInfo) { 
+                             document.getElementById('partnerActionsContainer').innerHTML = `<button class="partner-chat-btn w-full py-3 rounded-lg bg-cyan-500 font-semibold">Private Chat</button><button class="delete-duo-btn w-full py-3 rounded-lg bg-danger font-semibold mt-2" data-partner-id="${partnerData.id}" data-member-ids='${JSON.stringify(partnerData.members)}'>Delete Duo</button>`;
+                             document.getElementById('myPartnerName').textContent = partnerData.name; document.getElementById('myPartnerLogo').src = partnerData.partnerInfo.photoURL; 
+                             document.getElementById('myPartnerContainer').innerHTML = ui.userListItem(partnerData.partnerInfo).outerHTML; 
+                         } else { this.refreshCurrentScreen(); }
+                     });
+                } else {
+                    document.getElementById('partnerDetailsView').classList.add('hidden'); document.getElementById('noPartnerView').classList.remove('hidden');
+                    const availableContainer = document.getElementById('availablePartnersContainer');
+                    state.listeners[screenId] = services.listenToAvailablePartners(users => { availableContainer.innerHTML = users.length === 0 ? `<p class="text-sm text-center text-text-secondary">No players available.</p>` : users.map(u => ui.userListItem(u, { showInviteButton: true }).outerHTML).join(''); });
+                }
+            }
+            else if(screenId === 'requestsScreen') {
+                const receivedContainer = document.getElementById('receivedRequestsContainer');
+                state.listeners.receivedRequests = services.listenToRequests('received', requests => { receivedContainer.innerHTML = requests.length ? requests.map(req => ui.requestItem(req, 'received')).join('') : `<p class="text-sm text-center text-text-secondary">No new requests.</p>`; });
+                const sentContainer = document.getElementById('sentRequestsContainer');
+                state.listeners.sentRequests = services.listenToRequests('sent', requests => { sentContainer.innerHTML = requests.length ? requests.map(req => ui.requestItem(req, 'sent')).join('') : `<p class="text-sm text-center text-text-secondary">No sent requests.</p>`; });
+            }
+            else if(screenId === 'chatScreen' && state.currentChatContext) {
+                 const container = document.getElementById('chatMessagesContainer');
+                 state.listeners[screenId] = services.listenToChatMessages(state.currentChatContext.id, messages => {
+                    container.innerHTML = messages.map(ui.chatMessageItem).join('');
+                    if(container.children.length > 0) container.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+                 });
+            }
+             else if(screenId === 'walletScreen') {
+                const container = document.getElementById('transactionHistory');
+                state.listeners[screenId] = services.listenToTransactions(state.currentUser.uid, transactions => { container.innerHTML = transactions.length ? transactions.map(ui.transactionItem).join('') : `<p class="text-sm text-center text-text-secondary">No transactions yet.</p>` });
+            }
+            else if(screenId === 'noticeScreen') {
+                const container = document.getElementById('noticeContainer');
+                state.listeners[screenId] = services.listenToCollection('noticeboard', notices => { container.innerHTML = notices.length ? notices.map(ui.noticeItem).join('') : `<p class="text-sm text-center text-text-secondary">No notices available.</p>` });
+            }
+            else if(screenId === 'rulesScreen') {
+                const container = document.getElementById('rulesContainer');
+                state.listeners[screenId] = services.listenToDocument('app_content', 'rules', rules => { container.innerHTML = rules ? rules.content : 'Rules are not available yet.'; });
+            }
+             else if(screenId === 'guideScreen') {
+                const container = document.getElementById('guidesContainer');
+                state.listeners[screenId] = services.listenToCollection('guides', guides => { container.innerHTML = guides.length ? guides.map(ui.guideItem).join('') : `<p class="text-sm text-center text-text-secondary">No guides available.</p>`; });
+            }
+        },
+        async openInviteModal() {
+            this.toggleModal('inviteUserModal', true);
+            const listContainer = document.getElementById('inviteUserList');
+            listContainer.innerHTML = ui.loading();
+            const inviteableUsers = await services.getUsers([where('squadId', '==', null)]);
+            if (inviteableUsers.length === 0) { listContainer.innerHTML = `<p class="text-center text-text-secondary">No users available to invite.</p>`; return; }
+            listContainer.innerHTML = inviteableUsers.filter(u => u.id !== state.currentUser.uid).map(user => `<div class="flex items-center justify-between p-2 rounded-lg hover:bg-primary-bg"><div class="flex items-center gap-3"><img src="${user.photoURL}" class="w-10 h-10 rounded-full"><span class="text-sm">${user.username}</span></div><input type="checkbox" value="${user.id}" class="form-checkbox h-5 w-5 bg-card-bg border-white/20 rounded text-accent focus:ring-accent"></div>`).join('');
+        },
+        async handleSendInvites() {
+            const selectedUsers = Array.from(document.querySelectorAll('#inviteUserList input:checked')).map(cb => cb.value);
+            if (selectedUsers.length === 0) throw new Error("Please select at least one user to invite.");
+            const squadDoc = await getDoc(doc(db, 'squads', state.currentUserData.squadId));
+            const { name: squadName } = squadDoc.data();
+            for (const userId of selectedUsers) { await services.sendRequest('squad_invite', userId, { squadId: state.currentUserData.squadId, squadName }); }
+            alert(`${selectedUsers.length} invite(s) sent.`);
+            this.toggleModal(null, false);
+        },
+        openChat(context) { state.currentChatContext = context; this.navigateTo('chatScreen'); },
+        refreshCurrentScreen() { if (!state.currentScreen || !ui[state.currentScreen]) return; mainContent.innerHTML = ui[state.currentScreen](state.currentUserData); this.loadScreenData(state.currentScreen); },
+        updateHeader() {
+            const isAuth = ['loginScreen', 'registerScreen'].includes(state.currentScreen);
+            const isHome = state.currentScreen === 'homeScreen';
+            backBtn.style.visibility = (isHome || isAuth || state.screenHistory.length <= 1) ? 'hidden' : 'visible';
+            menuBtn.classList.toggle('hidden', isAuth || isHome || !state.currentUserData);
+            if(isHome) {
+                pageTitle.textContent = "Tourition Hub";
+            } else {
+                let titleText = (state.currentScreen || '').replace(/([A-Z])/g, ' $1').replace('Screen', '').trim();
+                if(state.currentScreen === 'chatScreen') titleText = 'Chat';
+                pageTitle.textContent = titleText.charAt(0).toUpperCase() + titleText.slice(1);
+            }
+        },
+        updateActiveNav() { document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.screen === state.currentScreen)); },
+        toggleModal(modalName, show, data = {}) { if (show) { modalContainer.innerHTML = ui[modalName] ? ui[modalName](data) : ''; } else { modalContainer.innerHTML = ''; } },
+        cleanupListeners(newScreenId = null) {
+            for (const key in state.listeners) { if (key !== 'userData' && key !== newScreenId) { if (typeof state.listeners[key] === 'function') { state.listeners[key](); delete state.listeners[key]; } } }
+            if (newScreenId === null) { if(state.listeners.userData) state.listeners.userData(); state.listeners = {}; }
+        }
+      };
+      appController.init();
+    </script>
+</body>
+</html>
