@@ -1,20 +1,19 @@
 {
   "name": "Tourition Hub",
   "short_name": "Tourition",
-  "start_url": "./index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0F1021",
   "theme_color": "#0F1021",
   "orientation": "portrait",
-  "scope": "./",
   "icons": [
     {
-      "src": "./icon.png",
+      "src": "icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "./icon.png",
+      "src": "icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
