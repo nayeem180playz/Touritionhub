@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Tourition Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 10px; }
+        .active-link { background-color: #374151; }
+        .sidebar { transition: transform 0.3s ease-in-out; }
+        #formModal ::-webkit-scrollbar-thumb { background: #374151; }
+        #formModal ::-webkit-scrollbar-track { background: #111827; }
+        .chat-message-text { white-space: pre-wrap; word-wrap: break-word; }
+        .chat-message-text img { max-width: 100%; border-radius: 0.5rem; margin-top: 0.5rem; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 font-sans">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold text-center text-white">Admin Panel Login</h2>
+            <form id="loginForm" class="space-y-6">
+                <div><label for="loginEmail" class="text-sm font-medium">Email</label><input type="email" id="loginEmail" required class="w-full px-4 py-2 mt-2 text-gray-200 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></div>
+                <div><label for="loginPassword" class="text-sm font-medium">Password</label><input type="password" id="loginPassword" required class="w-full px-4 py-2 mt-2 text-gray-200 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></div>
+                <button type="submit" class="w-full py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Admin Panel -->
+    <div id="adminPanel" class="hidden">
+        <div class="relative min-h-screen md:flex">
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex justify-between bg-gray-800 text-white p-4">
+                <h1 class="font-bold text-xl">Admin Panel</h1>
+                <button id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+            </div>
+
+            <!-- Sidebar -->
+            <div id="sidebar" class="sidebar bg-gray-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out z-20">
+                <h1 class="text-xl font-bold text-white text-center">Tourition Hub</h1>
+                <nav>
+                    <a href="#" class="sidebar-link active-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="dashboardContent"><i class="fas fa-tachometer-alt w-6"></i> Dashboard</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="takaRequestsContent"><i class="fas fa-hand-holding-usd w-6"></i> Taka Requests</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="withdrawalsContent"><i class="fas fa-money-bill-wave w-6"></i> Withdrawals</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="usersContent"><i class="fas fa-users w-6"></i> Users & Wallet</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="tournamentsContent"><i class="fas fa-trophy w-6"></i> Tournaments</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="squadsContent"><i class="fas fa-shield-alt w-6"></i> Squads</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="newsContent"><i class="fas fa-newspaper w-6"></i> News</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="noticeContent"><i class="fas fa-bullhorn w-6"></i> Notices</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="guidesContent"><i class="fas fa-book-open w-6"></i> Guides</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="rulesContent"><i class="fas fa-gavel w-6"></i> Rules</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="bannerContent"><i class="fas fa-image w-6"></i> Banner</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="welcomePopupContent"><i class="fas fa-hand-sparkles w-6"></i> Welcome Popup</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="contactContent"><i class="fas fa-headset w-6"></i> Contact Page</a>
+                    <a href="#" class="sidebar-link flex items-center px-4 py-2 text-gray-300 rounded-md hover:bg-gray-700" data-content="appUpdateContent"><i class="fas fa-cloud-download-alt w-6"></i> App Update</a>
+                </nav>
+                <button id="logoutBtn" class="absolute bottom-0 left-0 w-full py-3 font-semibold text-white bg-red-600/50 hover:bg-red-600/80"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 p-4 md:p-8 overflow-y-auto">
+                <div id="dashboardContent" class="content-section">
+                    <h2 class="text-3xl font-bold mb-6">Dashboard</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="p-6 bg-gray-800 rounded-lg"><h4 class="text-sm text-gray-400">Total Users</h4><p id="totalUsers" class="text-3xl font-bold">0</p></div>
+                        <div class="p-6 bg-gray-800 rounded-lg"><h4 class="text-sm text-gray-400">Total Wallet Balance</h4><p id="totalBalance" class="text-3xl font-bold">৳ 0</p></div>
+                        <div class="p-6 bg-gray-800 rounded-lg"><h4 class="text-sm text-gray-400">Pending Withdrawals</h4><p id="pendingWithdrawals" class="text-3xl font-bold">৳ 0</p></div>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">New Users (Last 7 Days)</h3>
+                        <canvas id="usersChart"></canvas>
+                    </div>
+                </div>
+                <div id="takaRequestsContent" class="content-section hidden">
+                    <h2 class="text-3xl font-bold mb-6">Taka Add Requests</h2>
+                    <div class="overflow-x-auto bg-gray-800 rounded-lg"><table class="w-full text-sm text-left"><thead class="bg-gray-700"><tr><th class="p-4">User</th><th class="p-4">Amount</th><th class="p-4">Method</th><th class="p-4">User Number</th><th class="p-4">Trx ID</th><th class="p-4">Actions</th></tr></thead><tbody id="takaRequestsTableBody"></tbody></table></div>
+                </div>
+                 <div id="withdrawalsContent" class="content-section hidden">
+                    <h2 class="text-3xl font-bold mb-6">Withdrawal Requests</h2>
+                    <div class="overflow-x-auto bg-gray-800 rounded-lg"><table class="w-full text-sm text-left"><thead class="bg-gray-700"><tr><th class="p-4">User</th><th class="p-4">Amount</th><th class="p-4">Method</th><th class="p-4">Receiver Number</th><th class="p-4">Actions</th></tr></thead><tbody id="withdrawalsTableBody"></tbody></table></div>
+                </div>
+                <div id="bannerContent" class="content-section hidden">
+                    <h2 class="text-3xl font-bold mb-6">Banner Management</h2>
+                    <div class="p-6 bg-gray-800 rounded-lg"><form id="bannerForm" class="space-y-4"><div><label class="block mb-2">Banner Image URL</label><input type="url" id="bannerUrlInput" class="w-full p-2 bg-gray-700 rounded-md"></div><div><label class="block mb-2">Banner Title</label><input type="text" id="bannerTitleInput" class="w-full p-2 bg-gray-700 rounded-md"></div><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Update Banner</button></form></div>
+                </div>
+                <div id="usersContent" class="content-section hidden">
+                    <h2 class="text-3xl font-bold mb-6">User & Wallet Management</h2>
+                    <div class="overflow-x-auto bg-gray-800 rounded-lg"><table class="w-full text-sm text-left"><thead class="bg-gray-700"><tr><th class="p-4">Username</th><th class="p-4">Balance</th><th class="p-4">Stats (P/W)</th><th class="p-4">Rating</th><th class="p-4">Admin</th><th class="p-4">Actions</th></tr></thead><tbody id="usersTableBody"></tbody></table></div>
+                </div>
+                 <div id="squadsContent" class="content-section hidden"><h2 class="text-3xl font-bold mb-6">Squads</h2><div id="squadsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
+                 <div id="newsContent" class="content-section hidden"><h2 class="text-3xl font-bold mb-6">News & Updates</h2><button id="createNewsBtn" class="mb-6 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Create News</button><div id="newsList" class="space-y-4"></div></div>
+                 <div id="noticeContent" class="content-section hidden"><h2 class="text-3xl font-bold mb-6">Notice Board</h2><button id="createNoticeBtn" class="mb-6 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Create Notice</button><div id="noticeList" class="space-y-4"></div></div>
+                 <div id="guidesContent" class="content-section hidden"><h2 class="text-3xl font-bold mb-6">Guides</h2><button id="createGuideBtn" class="mb-6 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Create Guide</button><div id="guidesList" class="space-y-4"></div></div>
+                 <div id="rulesContent" class="content-section hidden"><h2 class="text-3xl font-bold mb-6">Rules Management</h2><div class="p-6 bg-gray-800 rounded-lg"><form id="rulesForm" class="space-y-4"><div><label class="block mb-2">Rules Content (Use Markdown for formatting)</label><textarea id="rulesContentInput" rows="15" class="w-full p-2 bg-gray-700 rounded-md"></textarea></div><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Update Rules</button></form></div></div>
+                <div id="tournamentsContent" class="content-section hidden">
+                     <h2 class="text-3xl font-bold mb-6">Tournament Management</h2>
+                     <button id="createTournamentBtn" class="mb-6 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Create Tournament</button>
+                     <div id="tournamentsList" class="space-y-6"></div>
+                </div>
+                <div id="welcomePopupContent" class="content-section hidden">
+                    <h2 class="text-3xl font-bold mb-6">Welcome Popup Editor</h2>
+                    <div class="p-6 bg-gray-800 rounded-lg"><form id="welcomePopupForm" class="space-y-4"><div><label class="block mb-2">Popup Title</label><input type="text" id="welcomeTitleInput" class="w-full p-2 bg-gray-700 rounded-md"></div><div><label class="block mb-2">Content</label><textarea id="welcomeContentInput" rows="5" class="w-full p-2 bg-gray-700 rounded-md"></textarea></div><div><label class="block mb-2">Image URL (Optional)</label><input type="url" id="welcomeImageUrlInput" class="w-full p-2 bg-gray-700 rounded-md"></div><div><label class="block mb-2">Video URL (Optional, e.g., YouTube)</label><input type="url" id="welcomeVideoUrlInput" class="w-full p-2 bg-gray-700 rounded-md"></div><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save Popup</button></form></div>
+                </div>
+                <div id="contactContent" class="content-section hidden">
+                    <h2 class="text-3xl font-bold mb-6">Contact Page Editor</h2>
+                     <button id="editContactBtn" class="mb-6 px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Edit Contact Page</button>
+                     <div id="contactPreview" class="p-6 bg-gray-800 rounded-lg"></div>
+                </div>
+                <div id="appUpdateContent" class="content-section hidden">
+                    <h2 class="text-3xl font-bold mb-6">App Update Management</h2>
+                    <div class="p-6 bg-gray-800 rounded-lg">
+                        <form id="appUpdateForm" class="space-y-4">
+                            <div><label class="block mb-2">App Version</label><input type="text" id="appVersionInput" placeholder="e.g., v1.2.0" class="w-full p-2 bg-gray-700 rounded-md"></div>
+                            <div><label class="block mb-2">Download URL</label><input type="url" id="appUrlInput" placeholder="https://example.com/download" class="w-full p-2 bg-gray-700 rounded-md"></div>
+                            <div>
+                                <label class="block mb-2">Update Details</label>
+                                <textarea id="appDetailsInput" rows="6" class="w-full p-2 bg-gray-700 rounded-md" placeholder="List new features or fixes. Use a new line for each point."></textarea>
+                            </div>
+                            <button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Publish Update</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="formModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
+        <div id="modalContent" class="bg-gray-800 rounded-lg shadow-xl w-full max-w-lg p-6 space-y-4">
+             <!-- Dynamic Content Here -->
+        </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+      import { getFirestore, doc, getDoc, collection, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, query, getDocs, orderBy, writeBatch, increment, where, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+      // Firebase Config
+      const firebaseConfig = {
+        apiKey: "AIzaSyC3vBI-1FefY4Ft4Cks62hH9CL1IClds_Q",
+        authDomain: "e-sports-24ac6.firebaseapp.com",
+        projectId: "e-sports-24ac6",
+        storageBucket: "e-sports-24ac6.firebasestorage.app",
+        messagingSenderId: "984168922563",
+        appId: "1:984168922563:web:973d536ac2d24a364f5176",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // --- OneSignal Config ---
+      const ONESIGNAL_APP_ID = "a40800d3-3ce9-430d-a4d3-0de0791c6636";
+      const ONESIGNAL_REST_KEY = "t4ren2kope1k54qa2ucreq5t5";
+
+      class AdminApp {
+        constructor() { this.currentContent = 'dashboardContent'; this.loadedData = { tournaments: {}, news: {}, notices: {}, guides: {} }; this.chatUnsubscribe = null; this.currentAdminChatContext = null; this.usersChart = null; this.init(); }
+        init() { this.setupEventListeners(); this.checkAuthState(); }
+
+        checkAuthState() { onAuthStateChanged(auth, async user => { if (user) { const userDoc = await getDoc(doc(db, 'users', user.uid)); if (userDoc.exists() && userDoc.data().isAdmin) { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('adminPanel').classList.remove('hidden'); this.loadAllData(); } else { alert('Access Denied. You are not an admin.'); signOut(auth); } } else { document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('adminPanel').classList.add('hidden'); } }); }
+
+        setupEventListeners() {
+            document.getElementById('loginForm').addEventListener('submit', e => { e.preventDefault(); this.handleLogin(); });
+            document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+            document.querySelectorAll('.sidebar-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); this.showContent(e.currentTarget.dataset.content); }));
+            document.getElementById('bannerForm').addEventListener('submit', e => { e.preventDefault(); this.handleBannerUpdate(); });
+            document.getElementById('rulesForm').addEventListener('submit', e => { e.preventDefault(); this.handleRulesUpdate(); });
+            document.getElementById('appUpdateForm').addEventListener('submit', e => { e.preventDefault(); this.handleAppUpdate(); });
+            document.getElementById('welcomePopupForm').addEventListener('submit', e => { e.preventDefault(); this.handleWelcomePopupUpdate(); });
+            document.getElementById('editContactBtn').addEventListener('click', () => this.openContactEditorModal());
+            document.getElementById('createTournamentBtn').addEventListener('click', () => this.openTournamentModal());
+            document.getElementById('createNewsBtn').addEventListener('click', () => this.openNewsModal());
+            document.getElementById('createNoticeBtn').addEventListener('click', () => this.openNoticeModal());
+            document.getElementById('createGuideBtn').addEventListener('click', () => this.openGuideModal());
+            document.getElementById('formModal').addEventListener('click', e => { if (e.target.id === 'formModal') this.closeModal(); });
+            document.getElementById('mobileMenuBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('-translate-x-full'));
+            document.body.addEventListener('click', e => {
+                const target = e.target;
+                if (target.matches('.toggle-admin-btn')) this.toggleAdmin(target.dataset.id);
+                if (target.matches('.edit-balance-btn')) this.openBalanceModal(target.dataset.id, target.dataset.username, target.dataset.balance);
+                if (target.matches('.edit-stats-btn')) this.openStatsModal(target.dataset.id, target.dataset.username, JSON.parse(target.dataset.stats), target.dataset.rating);
+                if (target.matches('.delete-squad-btn')) if (confirm('Are you sure you want to delete this squad?')) this.deleteSquad(target.dataset.id, JSON.parse(target.dataset.members));
+                
+                // --- Updated Delete Actions with Notifications ---
+                if (target.matches('.delete-news-btn')) {
+                    if (confirm('Are you sure? This will notify users.')) {
+                        deleteDoc(doc(db, 'news', target.dataset.id)).then(() => this.sendNotificationToAll("News Removed", "A news item has been removed."));
+                    }
+                }
+                if (target.matches('.delete-notice-btn')) {
+                    if (confirm('Are you sure? This will notify users.')) {
+                        deleteDoc(doc(db, 'noticeboard', target.dataset.id)).then(() => this.sendNotificationToAll("Notice Removed", "A notice has been removed."));
+                    }
+                }
+                if (target.matches('.delete-guide-btn')) {
+                    if (confirm('Are you sure? This will notify users.')) {
+                        deleteDoc(doc(db, 'guides', target.dataset.id)).then(() => this.sendNotificationToAll("Guide Removed", "A guide has been removed."));
+                    }
+                }
+                if (target.matches('.delete-tournament-btn')) {
+                    if (confirm('Are you sure? This will notify users.')) {
+                        deleteDoc(doc(db, 'tournaments', target.dataset.type, 'items', target.dataset.id)).then(() => this.sendNotificationToAll("Tournament Removed", "A tournament has been cancelled/removed."));
+                    }
+                }
+
+                if (target.matches('.edit-news-btn')) this.openNewsModal(this.loadedData.news[target.dataset.id]);
+                if (target.matches('.edit-notice-btn')) this.openNoticeModal(this.loadedData.notices[target.dataset.id]);
+                if (target.matches('.edit-guide-btn')) this.openGuideModal(this.loadedData.guides[target.dataset.id]);
+                if (target.matches('.edit-tournament-btn')) this.openTournamentModal(this.loadedData.tournaments[`${target.dataset.type}-${target.dataset.id}`], target.dataset.type);
+                if(target.matches('.view-players-btn')) this.viewTournamentPlayers(this.loadedData.tournaments[`${target.dataset.type}-${target.dataset.id}`], target.dataset.type);
+                if(target.matches('.chat-tournament-btn')) this.openTournamentChat(target.dataset.type, target.dataset.id);
+                if(target.matches('.post-result-btn')) this.openResultModal(target.dataset.id, target.dataset.type);
+                if(target.matches('.post-stats-btn')) this.openPostStatsModal(this.loadedData.tournaments[`${target.dataset.type}-${target.dataset.id}`], target.dataset.type);
+                if(target.matches('.manage-qualify-btn')) this.openQualifyModal(this.loadedData.tournaments[`${target.dataset.type}-${target.dataset.id}`], target.dataset.type);
+                if(target.matches('.publish-room-btn')) this.openPublishRoomModal(this.loadedData.tournaments[`${target.dataset.type}-${target.dataset.id}`], target.dataset.type);
+                if(target.matches('#adminChatSendBtn')) this.handleAdminSendMessage();
+                if(target.matches('.close-modal-btn')) this.closeModal();
+                const takaRequestAction = target.closest('.taka-request-action');
+                if(takaRequestAction) {
+                    const req = JSON.parse(takaRequestAction.dataset.req);
+                    const action = takaRequestAction.dataset.action;
+                    this.handleTakaRequest(req, action === 'accept');
+                }
+                const withdrawalAction = target.closest('.withdrawal-action');
+                if (withdrawalAction) {
+                    const req = JSON.parse(withdrawalAction.dataset.req);
+                    this.handleWithdrawalRequest(req, withdrawalAction.dataset.action === 'approve');
+                }
+            });
+        }
+
+        // --- OneSignal Notification Logic ---
+        async sendNotification(playerIds, title, message, data = null) {
+            if(!playerIds || playerIds.length === 0) return;
+            this.executeOneSignalRequest({
+                app_id: ONESIGNAL_APP_ID,
+                include_player_ids: playerIds,
+                headings: { "en": title },
+                contents: { "en": message },
+                data: data
+            });
+        }
+
+        async sendNotificationToAll(title, message, data = null) {
+            this.executeOneSignalRequest({
+                app_id: ONESIGNAL_APP_ID,
+                included_segments: ["All"],
+                headings: { "en": title },
+                contents: { "en": message },
+                data: data
+            });
+        }
+
+        async executeOneSignalRequest(payload) {
+            try {
+                await fetch("https://onesignal.com/api/v1/notifications", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json; charset=utf-8", "Authorization": `Basic ${ONESIGNAL_REST_KEY}` },
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) { console.error("Notification Error:", e); }
+        }
+
+        async getUserNotifId(uid) {
+            try {
+                const docSnap = await getDoc(doc(db, "users", uid));
+                if(docSnap.exists() && docSnap.data().notificationId) return docSnap.data().notificationId;
+            } catch(e) { console.error(e); }
+            return null;
+        }
+
+        async handleLogin() { const email = document.getElementById('loginEmail').value; const password = document.getElementById('loginPassword').value; try { await signInWithEmailAndPassword(auth, email, password); } catch (error) { alert(`Login failed: ${error.message}`); } }
+        loadAllData() { this.loadDashboard(); this.loadBanner(); this.loadUsers(); this.loadSquads(); this.loadNews(); this.loadNotices(); this.loadGuides(); this.loadRules(); this.loadTournaments(); this.loadTakaRequests(); this.loadAppUpdate(); this.loadWelcomePopup(); this.loadContactContent(); this.loadWithdrawals(); }
+        async loadDashboard() { 
+            onSnapshot(collection(db, 'users'), snap => { document.getElementById('totalUsers').textContent = snap.size; let totalBalance = 0; snap.forEach(doc => { totalBalance += doc.data().balance || 0; }); document.getElementById('totalBalance').textContent = `৳ ${totalBalance.toLocaleString()}`; }); 
+            onSnapshot(query(collection(db, 'withdrawalRequests'), where('status', '==', 'pending')), snap => { let pendingAmount = 0; snap.forEach(doc => { pendingAmount += doc.data().amount || 0; }); document.getElementById('pendingWithdrawals').textContent = `৳ ${pendingAmount.toLocaleString()}`; });
+            const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            const usersQuery = query(collection(db, 'users'), where('createdAt', '>=', sevenDaysAgo));
+            const userSnap = await getDocs(usersQuery);
+            const dailyCounts = {}; for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); dailyCounts[d.toISOString().split('T')[0]] = 0; }
+            userSnap.forEach(doc => { const date = doc.data().createdAt.toDate().toISOString().split('T')[0]; if (dailyCounts[date] !== undefined) dailyCounts[date]++; });
+            const chartLabels = Object.keys(dailyCounts).reverse(); const chartData = Object.values(dailyCounts).reverse();
+            if (this.usersChart) this.usersChart.destroy();
+            this.usersChart = new Chart(document.getElementById('usersChart').getContext('2d'), { type: 'line', data: { labels: chartLabels, datasets: [{ label: 'New Users', data: chartData, borderColor: '#4f46e5', tension: 0.1 }] } });
+        }
+        loadBanner() { onSnapshot(doc(db, 'app', 'banner'), docSnap => { if (docSnap.exists()) { document.getElementById('bannerUrlInput').value = docSnap.data().imageUrl; document.getElementById('bannerTitleInput').value = docSnap.data().title; } }); }
+        
+        async handleBannerUpdate() { 
+            const url = document.getElementById('bannerUrlInput').value; 
+            const title = document.getElementById('bannerTitleInput').value; 
+            await updateDoc(doc(db, 'app', 'banner'), { imageUrl: url, title: title, updatedAt: serverTimestamp() }); 
+            // Notify
+            this.sendNotificationToAll("New Banner", `Check out the new banner: ${title}`);
+            alert('Banner Updated!'); 
+        }
+
+        loadUsers() { const tbody = document.getElementById('usersTableBody'); onSnapshot(query(collection(db, 'users'), orderBy('createdAt', 'desc')), snap => { tbody.innerHTML = ''; snap.forEach(doc => { const user = { id: doc.id, ...doc.data() }; const stats = user.stats || { played: 0, won: 0 }; const rating = user.ratingPoints || 0; const tr = document.createElement('tr'); tr.className = 'border-b border-gray-700'; tr.innerHTML = `<td class="p-4">${user.username}</td><td class="p-4 font-semibold text-yellow-400">৳ ${user.balance || 0}</td><td class="p-4">${stats.played}/${stats.won}</td><td class="p-4">${rating}</td><td class="p-4">${user.isAdmin ? '<span class="text-green-400">Yes</span>' : 'No'}</td><td class="p-4 flex flex-wrap gap-2"><button data-id="${user.id}" data-username="${user.username}" data-balance="${user.balance || 0}" class="edit-balance-btn px-2 py-1 text-xs rounded bg-blue-600">Wallet</button><button data-id="${user.id}" data-username="${user.username}" data-stats='${JSON.stringify(stats)}' data-rating="${rating}" class="edit-stats-btn px-2 py-1 text-xs rounded bg-purple-600">Stats</button><button data-id="${user.id}" class="toggle-admin-btn px-2 py-1 text-xs rounded ${user.isAdmin ? 'bg-yellow-600' : 'bg-green-600'}">${user.isAdmin ? 'Revoke' : 'Make'} Admin</button></td>`; tbody.appendChild(tr); }); }); }
+        async toggleAdmin(userId) { if(userId === auth.currentUser.uid) { alert("You cannot change your own admin status."); return; } const userRef = doc(db, 'users', userId); const userDoc = await getDoc(userRef); await updateDoc(userRef, { isAdmin: !userDoc.data().isAdmin }); alert('Admin status updated.'); }
+        
+        openBalanceModal(userId, username, balance) { const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = `<h3 class="text-xl font-bold">Manage Wallet for ${username}</h3><p>Current Balance: <span class="font-bold text-yellow-400">৳ ${balance}</span></p><form id="balanceForm" class="space-y-4 mt-4"><div><label class="block mb-2">Amount (Use negative to subtract)</label><input type="number" id="balanceAmount" placeholder="e.g., 50 or -20" required class="w-full p-2 bg-gray-700 rounded-md"></div><div class="flex justify-end gap-4 pt-4"><button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">Cancel</button><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Update Balance</button></div></form>`; document.getElementById('balanceForm').addEventListener('submit', async e => { e.preventDefault(); const amount = Number(document.getElementById('balanceAmount').value); if(isNaN(amount) || amount === 0) return; const batch = writeBatch(db); const userRef = doc(db, 'users', userId); batch.update(userRef, { balance: increment(amount) }); batch.set(doc(collection(db, 'users', userId, 'transactions')), { amount: amount, description: 'Balance updated by Admin', timestamp: serverTimestamp() }); await batch.commit(); 
+            // Notify User
+            const notifId = await this.getUserNotifId(userId);
+            if(notifId) this.sendNotification([notifId], "Balance Updated", `Admin updated your balance by ৳${amount}.`);
+            alert('Balance updated!'); this.closeModal(); }); this.toggleModal(true); 
+        }
+        openStatsModal(userId, username, stats, rating) { const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = `<h3 class="text-xl font-bold">Edit Stats for ${username}</h3><form id="statsForm" class="space-y-4 mt-4"><div class="grid grid-cols-3 gap-4"><div><label class="block mb-2">Matches Played</label><input type="number" id="playedCount" required class="w-full p-2 bg-gray-700 rounded-md" value="${stats.played || 0}"></div><div><label class="block mb-2">Matches Won</label><input type="number" id="wonCount" required class="w-full p-2 bg-gray-700 rounded-md" value="${stats.won || 0}"></div><div><label class="block mb-2">Rating Points</label><input type="number" id="ratingPoints" required class="w-full p-2 bg-gray-700 rounded-md" value="${rating || 0}"></div></div><div class="flex justify-end gap-4 pt-4"><button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md">Update Stats</button></div></form>`; document.getElementById('statsForm').addEventListener('submit', async e => { e.preventDefault(); const newStats = { stats: { played: Number(document.getElementById('playedCount').value), won: Number(document.getElementById('wonCount').value) }, ratingPoints: Number(document.getElementById('ratingPoints').value) }; await updateDoc(doc(db, 'users', userId), newStats); alert('Stats updated!'); this.closeModal(); }); this.toggleModal(true); }
+        loadSquads() { const container = document.getElementById('squadsList'); onSnapshot(collection(db, 'squads'), snap => { container.innerHTML = ''; snap.forEach(doc => { const squad = { id: doc.id, ...doc.data() }; const el = document.createElement('div'); el.className = 'bg-gray-800 p-4 rounded-lg'; el.innerHTML = `<h4 class="font-bold">${squad.name}</h4><p class="text-sm text-gray-400">Members: ${squad.members.length}</p><button data-id="${squad.id}" data-members='${JSON.stringify(squad.members)}' class="delete-squad-btn mt-4 px-2 py-1 text-xs rounded bg-red-600">Delete</button>`; container.appendChild(el); }); }); }
+        async deleteSquad(squadId, memberIds) { const batch = writeBatch(db); batch.delete(doc(db, "squads", squadId)); memberIds.forEach(id => batch.update(doc(db, "users", id), { squadId: null })); await batch.commit(); alert('Squad deleted.'); }
+        
+        loadNews() { const container = document.getElementById('newsList'); onSnapshot(query(collection(db, 'news'), orderBy('createdAt', 'desc')), snap => { this.loadedData.news = {}; container.innerHTML = ''; snap.forEach(doc => { const news = { id: doc.id, ...doc.data() }; this.loadedData.news[doc.id] = news; const el = document.createElement('div'); el.className = 'bg-gray-800 p-4 rounded-lg flex justify-between items-center'; el.innerHTML = `<div><h4 class="font-bold">${news.title}</h4><p class="text-sm text-gray-400">${(news.content || '').substring(0, 50)}...</p></div><div><button data-id="${doc.id}" class="edit-news-btn px-3 py-1 rounded bg-yellow-600 text-xs mr-2">Edit</button><button data-id="${doc.id}" class="delete-news-btn px-3 py-1 rounded bg-red-600 text-xs">Delete</button></div>`; container.appendChild(el); }); }); }
+        openNewsModal(data = null) { const isEdit = !!data; const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = `<h3 class="text-xl font-bold">${isEdit ? 'Edit' : 'Create'} News</h3> <form id="newsForm" class="space-y-4"> <div><label>Title</label><input type="text" id="newsTitle" required class="w-full p-2 bg-gray-700 rounded-md" value="${data?.title || ''}"></div> <div><label>Content</label><textarea id="newsContent" rows="5" required class="w-full p-2 bg-gray-700 rounded-md">${data?.content || ''}</textarea></div> <div class="flex justify-end gap-4 pt-4"><button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">Cancel</button><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save</button></div> </form> `; document.getElementById('newsForm').addEventListener('submit', e => { e.preventDefault(); this.handleNewsSubmit(data?.id); }); this.toggleModal(true); }
+        async handleNewsSubmit(id) { 
+            const newsData = { title: document.getElementById('newsTitle').value, content: document.getElementById('newsContent').value }; 
+            if (id) { 
+                newsData.updatedAt = serverTimestamp(); await updateDoc(doc(db, 'news', id), newsData); 
+                this.sendNotificationToAll("News Updated", `Update: ${newsData.title}`);
+            } else { 
+                newsData.createdAt = serverTimestamp(); await addDoc(collection(db, 'news'), newsData); 
+                this.sendNotificationToAll("New News", newsData.title);
+            } 
+            alert(`News ${id ? 'Updated' : 'Published'}!`); this.closeModal(); 
+        }
+
+        loadNotices() { const container = document.getElementById('noticeList'); onSnapshot(query(collection(db, 'noticeboard'), orderBy('createdAt', 'desc')), snap => { this.loadedData.notices = {}; container.innerHTML = ''; snap.forEach(doc => { const notice = { id: doc.id, ...doc.data() }; this.loadedData.notices[doc.id] = notice; const el = document.createElement('div'); el.className = 'bg-gray-800 p-4 rounded-lg flex justify-between items-center'; el.innerHTML = `<div><h4 class="font-bold">${notice.title}</h4><p class="text-sm text-gray-400">${(notice.content || '').substring(0, 50)}...</p></div><div><button data-id="${doc.id}" class="edit-notice-btn px-3 py-1 rounded bg-yellow-600 text-xs mr-2">Edit</button><button data-id="${doc.id}" class="delete-notice-btn px-3 py-1 rounded bg-red-600 text-xs">Delete</button></div>`; container.appendChild(el); }); }); }
+        openNoticeModal(data = null) { const isEdit = !!data; const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = `<h3 class="text-xl font-bold">${isEdit ? 'Edit' : 'Create'} Notice</h3><form id="noticeForm" class="space-y-4"> <div><label>Title</label><input type="text" id="noticeTitle" required class="w-full p-2 bg-gray-700 rounded-md" value="${data?.title || ''}"></div> <div><label>Content</label><textarea id="noticeContent" rows="5" required class="w-full p-2 bg-gray-700 rounded-md">${data?.content || ''}</textarea></div> <div class="flex justify-end gap-4 pt-4"><button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">Cancel</button><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save</button></div> </form> `; document.getElementById('noticeForm').addEventListener('submit', e => { e.preventDefault(); this.handleNoticeSubmit(data?.id); }); this.toggleModal(true); }
+        async handleNoticeSubmit(id) { 
+            const noticeData = { title: document.getElementById('noticeTitle').value, content: document.getElementById('noticeContent').value }; 
+            if (id) { 
+                noticeData.updatedAt = serverTimestamp(); await updateDoc(doc(db, 'noticeboard', id), noticeData); 
+                this.sendNotificationToAll("Notice Updated", `Update: ${noticeData.title}`);
+            } else { 
+                noticeData.createdAt = serverTimestamp(); await addDoc(collection(db, 'noticeboard'), noticeData); 
+                this.sendNotificationToAll("New Notice", noticeData.title);
+            } 
+            alert(`Notice ${id ? 'Updated' : 'Published'}!`); this.closeModal(); 
+        }
+
+        loadGuides() { const container = document.getElementById('guidesList'); onSnapshot(query(collection(db, 'guides'), orderBy('createdAt', 'desc')), snap => { this.loadedData.guides = {}; container.innerHTML = ''; snap.forEach(doc => { const guide = { id: doc.id, ...doc.data() }; this.loadedData.guides[doc.id] = guide; const el = document.createElement('div'); el.className = 'bg-gray-800 p-4 rounded-lg flex justify-between items-center'; el.innerHTML = `<div><h4 class="font-bold">${guide.title}</h4><p class="text-sm text-gray-400">${(guide.description || '').substring(0, 50)}...</p></div><div><button data-id="${doc.id}" class="edit-guide-btn px-3 py-1 rounded bg-yellow-600 text-xs mr-2">Edit</button><button data-id="${doc.id}" class="delete-guide-btn px-3 py-1 rounded bg-red-600 text-xs">Delete</button></div>`; container.appendChild(el); }); }); }
+        openGuideModal(data = null) { const isEdit = !!data; const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = `<h3 class="text-xl font-bold">${isEdit ? 'Edit' : 'Create'} Guide</h3><form id="guideForm" class="space-y-3 overflow-y-auto max-h-[60vh] p-2"><div><label>Title</label><input id="guideTitle" type="text" required class="w-full p-2 bg-gray-700 rounded-md" value="${data?.title || ''}"></div><div><label>Main Image URL</label><input id="guideImageUrl" type="url" required class="w-full p-2 bg-gray-700 rounded-md" value="${data?.imageUrl || ''}"></div><div><label>Video URL (Optional)</label><input id="guideVideoUrl" type="url" class="w-full p-2 bg-gray-700 rounded-md" value="${data?.videoUrl || ''}"></div><div><label>Description</label><textarea id="guideDescription" rows="4" required class="w-full p-2 bg-gray-700 rounded-md">${data?.description || ''}</textarea></div><div id="columnsContainer"></div><button type="button" id="addColumnBtn" class="mt-2 text-sm text-indigo-400 hover:text-indigo-300">+ Add Column (Image/Text)</button><div class="flex justify-end gap-4 pt-4"><button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">Cancel</button><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save</button></div></form>`; 
+            const columnsContainer = document.getElementById('columnsContainer');
+            if (isEdit && data.columns) { data.columns.forEach(col => this.addColumn(columnsContainer, col)); }
+            document.getElementById('addColumnBtn').addEventListener('click', () => this.addColumn(columnsContainer)); document.getElementById('guideForm').addEventListener('submit', e => { e.preventDefault(); this.handleGuideSubmit(data?.id); }); this.toggleModal(true); 
+        }
+        addColumn(container, data = {}) { const colDiv = document.createElement('div'); colDiv.className = 'space-y-2 border-t border-gray-700 pt-3 mt-3'; colDiv.innerHTML = `<label class="text-sm">Additional Column</label><input type="url" class="w-full p-2 bg-gray-700 rounded-md column-image" placeholder="Image URL (Optional)" value="${data.imageUrl || ''}"><textarea rows="3" class="w-full p-2 bg-gray-700 rounded-md column-desc" placeholder="Description...">${data.description || ''}</textarea>`; container.appendChild(colDiv); }
+        async handleGuideSubmit(id) {
+            const guideData = { title: document.getElementById('guideTitle').value, imageUrl: document.getElementById('guideImageUrl').value, videoUrl: document.getElementById('guideVideoUrl').value, description: document.getElementById('guideDescription').value, columns: [] };
+            document.querySelectorAll('#columnsContainer > div').forEach(colDiv => { const img = colDiv.querySelector('.column-image').value; const desc = colDiv.querySelector('.column-desc').value; if(img || desc) guideData.columns.push({ imageUrl: img, description: desc }); });
+            if (id) { 
+                guideData.updatedAt = serverTimestamp(); await updateDoc(doc(db, 'guides', id), guideData); 
+                this.sendNotificationToAll("Guide Updated", `Updated: ${guideData.title}`);
+            } else { 
+                guideData.createdAt = serverTimestamp(); await addDoc(collection(db, 'guides'), guideData); 
+                this.sendNotificationToAll("New Guide", guideData.title);
+            }
+            alert(`Guide ${id ? 'Updated' : 'Published'}!`); this.closeModal();
+        }
+
+        loadRules() { onSnapshot(doc(db, 'app_content', 'rules'), docSnap => { if (docSnap.exists()) { document.getElementById('rulesContentInput').value = docSnap.data().content; } }); }
+        
+        async handleRulesUpdate() { 
+            const content = document.getElementById('rulesContentInput').value; 
+            await setDoc(doc(db, 'app_content', 'rules'), { content, updatedAt: serverTimestamp() }); 
+            this.sendNotificationToAll("Rules Updated", "Please check the updated rules.");
+            alert('Rules Updated!'); 
+        }
+
+        loadAppUpdate() { onSnapshot(doc(db, 'app', 'update'), docSnap => { if (docSnap.exists()) { const data = docSnap.data(); document.getElementById('appVersionInput').value = data.version || ''; document.getElementById('appUrlInput').value = data.downloadUrl || ''; document.getElementById('appDetailsInput').value = (data.details || '').replace(/\\n/g, '\n'); } }); }
+        
+        async handleAppUpdate() { 
+            const version = document.getElementById('appVersionInput').value; 
+            const downloadUrl = document.getElementById('appUrlInput').value; 
+            const details = document.getElementById('appDetailsInput').value.replace(/\n/g, '\\n'); 
+            await setDoc(doc(db, 'app', 'update'), { version, downloadUrl, details, updatedAt: serverTimestamp() }); 
+            this.sendNotificationToAll("App Update Available", `New Version ${version} is now available!`);
+            alert('App Update Info Published!'); 
+        }
+        
+        loadTakaRequests() { const tbody = document.getElementById('takaRequestsTableBody'); onSnapshot(query(collection(db, 'takaRequests'), where('status', '==', 'pending'), orderBy('createdAt', 'asc')), snap => { tbody.innerHTML = ''; snap.forEach(doc => { const req = { id: doc.id, ...doc.data() }; const tr = document.createElement('tr'); tr.className = 'border-b border-gray-700'; tr.innerHTML = `<td class="p-4">${req.username}</td><td class="p-4 font-bold text-green-400">৳ ${req.amount}</td><td class="p-4">${req.method}</td><td class="p-4">${req.number}</td><td class="p-4 text-xs">${req.trxId}</td><td class="p-4 flex gap-2"><button class="taka-request-action px-2 py-1 text-xs rounded bg-green-600" data-action="accept" data-req='${JSON.stringify(req)}'>Accept</button><button class="taka-request-action px-2 py-1 text-xs rounded bg-red-600" data-action="reject" data-req='${JSON.stringify(req)}'>Reject</button></td>`; tbody.appendChild(tr); }); }); }
+        
+        async handleTakaRequest(req, isAccepted) {
+            const reqRef = doc(db, 'takaRequests', req.id);
+            if (isAccepted) {
+                const userRef = doc(db, 'users', req.userId);
+                const batch = writeBatch(db);
+                batch.update(userRef, { balance: increment(req.amount) });
+                batch.set(doc(collection(db, 'users', req.userId, 'transactions')), { amount: req.amount, description: `Deposit via ${req.method} (TrxID: ${req.trxId})`, timestamp: serverTimestamp() });
+                batch.update(reqRef, { status: 'accepted', processedAt: serverTimestamp() });
+                await batch.commit();
+                // Notify User
+                const notifId = await this.getUserNotifId(req.userId);
+                if(notifId) this.sendNotification([notifId], "Deposit Approved", `৳${req.amount} added to your wallet successfully.`);
+            } else {
+                await updateDoc(reqRef, { status: 'rejected', processedAt: serverTimestamp() });
+                // Notify User
+                const notifId = await this.getUserNotifId(req.userId);
+                if(notifId) this.sendNotification([notifId], "Deposit Rejected", `Your deposit request for ৳${req.amount} was rejected.`);
+            }
+            alert(`Request has been ${isAccepted ? 'accepted' : 'rejected'}.`);
+        }
+
+        loadWithdrawals() { const tbody = document.getElementById('withdrawalsTableBody'); onSnapshot(query(collection(db, 'withdrawalRequests'), where('status', '==', 'pending'), orderBy('createdAt', 'asc')), snap => { tbody.innerHTML = ''; snap.forEach(doc => { const req = { id: doc.id, ...doc.data() }; const tr = document.createElement('tr'); tr.className = 'border-b border-gray-700'; tr.innerHTML = `<td class="p-4">${req.username}</td><td class="p-4 font-bold text-red-400">৳ ${req.amount}</td><td class="p-4">${req.method}</td><td class="p-4">${req.number}</td><td class="p-4 flex gap-2"><button class="withdrawal-action px-2 py-1 text-xs rounded bg-green-600" data-action="approve" data-req='${JSON.stringify(req)}'>Approve</button><button class="withdrawal-action px-2 py-1 text-xs rounded bg-red-600" data-action="reject" data-req='${JSON.stringify(req)}'>Reject</button></td>`; tbody.appendChild(tr); }); }); }
+        
+        async handleWithdrawalRequest(req, isApproved) { 
+            const reqRef = doc(db, 'withdrawalRequests', req.id); 
+            if (isApproved) { 
+                const userRef = doc(db, 'users', req.userId); const userDoc = await getDoc(userRef); 
+                if (userDoc.data().balance < req.amount) { alert("Error: User has insufficient balance."); return; } 
+                const batch = writeBatch(db); batch.update(userRef, { balance: increment(-req.amount) }); 
+                batch.set(doc(collection(db, 'users', req.userId, 'transactions')), { amount: -req.amount, description: `Withdrawal via ${req.method}`, timestamp: serverTimestamp() }); 
+                batch.update(reqRef, { status: 'approved', processedAt: serverTimestamp() }); await batch.commit(); 
+                // Notify User
+                const notifId = await this.getUserNotifId(req.userId);
+                if(notifId) this.sendNotification([notifId], "Withdrawal Approved", `Your withdrawal of ৳${req.amount} is successful.`);
+            } else { 
+                await updateDoc(reqRef, { status: 'rejected', processedAt: serverTimestamp() }); 
+                // Notify User
+                const notifId = await this.getUserNotifId(req.userId);
+                if(notifId) this.sendNotification([notifId], "Withdrawal Rejected", `Your withdrawal request was rejected.`);
+            } 
+            alert(`Request has been ${isApproved ? 'approved' : 'rejected'}.`); 
+        }
+
+        loadWelcomePopup() { onSnapshot(doc(db, 'app', 'welcomePopup'), docSnap => { if (docSnap.exists()) { const data = docSnap.data(); document.getElementById('welcomeTitleInput').value = data.title || ''; document.getElementById('welcomeContentInput').value = data.content || ''; document.getElementById('welcomeImageUrlInput').value = data.imageUrl || ''; document.getElementById('welcomeVideoUrlInput').value = data.videoUrl || ''; } }); }
+        async handleWelcomePopupUpdate() { const data = { title: document.getElementById('welcomeTitleInput').value, content: document.getElementById('welcomeContentInput').value, imageUrl: document.getElementById('welcomeImageUrlInput').value, videoUrl: document.getElementById('welcomeVideoUrlInput').value, updatedAt: serverTimestamp() }; await setDoc(doc(db, 'app', 'welcomePopup'), data); alert('Welcome Popup Updated!'); }
+        loadContactContent() { onSnapshot(doc(db, 'app_content', 'contact'), docSnap => { const container = document.getElementById('contactPreview'); if (docSnap.exists() && docSnap.data().items) { container.innerHTML = docSnap.data().items.map(item => `<div class="mb-4"><h4 class="font-bold">${item.title}</h4><p class="text-sm text-gray-400">${item.description.substring(0,100)}...</p></div>`).join(''); } else { container.innerHTML = 'No content set.'; } }); }
+        openContactEditorModal() { getDoc(doc(db, 'app_content', 'contact')).then(docSnap => { const data = docSnap.exists() ? docSnap.data().items : []; const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = `<h3 class="text-xl font-bold">Edit Contact Page</h3><form id="contactForm" class="space-y-3 overflow-y-auto max-h-[60vh] p-2"><div id="contactItemsContainer"></div><button type="button" id="addContactItemBtn" class="mt-2 text-sm text-indigo-400 hover:text-indigo-300">+ Add Item</button><div class="flex justify-end gap-4 pt-4"><button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">Cancel</button><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save</button></div></form>`; const itemsContainer = document.getElementById('contactItemsContainer'); if (data.length > 0) { data.forEach(item => this.addContactItem(itemsContainer, item)); } else { this.addContactItem(itemsContainer); } document.getElementById('addContactItemBtn').addEventListener('click', () => this.addContactItem(itemsContainer)); document.getElementById('contactForm').addEventListener('submit', e => { e.preventDefault(); this.handleContactSubmit(); }); this.toggleModal(true); }); }
+        addContactItem(container, data = {}) { const itemDiv = document.createElement('div'); itemDiv.className = 'space-y-2 border-t border-gray-700 pt-3 mt-3'; itemDiv.innerHTML = `<input type="text" class="w-full p-2 bg-gray-700 rounded-md contact-item-title" placeholder="Title" value="${data.title || ''}"><input type="url" class="w-full p-2 bg-gray-700 rounded-md contact-item-image" placeholder="Image URL (Optional)" value="${data.imageUrl || ''}"><input type="url" class="w-full p-2 bg-gray-700 rounded-md contact-item-video" placeholder="Video URL (Optional)" value="${data.videoUrl || ''}"><textarea rows="3" class="w-full p-2 bg-gray-700 rounded-md contact-item-desc" placeholder="Description...">${data.description || ''}</textarea>`; container.appendChild(itemDiv); }
+        async handleContactSubmit() { const items = []; document.querySelectorAll('#contactItemsContainer > div').forEach(div => { const title = div.querySelector('.contact-item-title').value; const desc = div.querySelector('.contact-item-desc').value; if(title || desc) items.push({ title, imageUrl: div.querySelector('.contact-item-image').value, videoUrl: div.querySelector('.contact-item-video').value, description: desc }); }); await setDoc(doc(db, 'app_content', 'contact'), { items, updatedAt: serverTimestamp() }); alert('Contact Page Updated!'); this.closeModal(); }
+        loadTournaments() { this.loadedData.tournaments = {}; const container = document.getElementById('tournamentsList'); container.innerHTML = ''; ['solo', 'duo', 'squad'].forEach(type => { const q = query(collection(db, 'tournaments', type, 'items'), orderBy('createdAt', 'desc')); onSnapshot(q, snap => { snap.docChanges().forEach(change => { const t = { id: change.doc.id, ...change.doc.data() }; this.loadedData.tournaments[`${type}-${t.id}`] = t; const existingEl = document.getElementById(`t-${type}-${t.id}`); if (change.type === "removed") { existingEl?.remove(); } else { const newEl = this.createTournamentListItem(t, type); if (existingEl) { container.replaceChild(newEl, existingEl); } else { container.prepend(newEl); } } }); }); }); }
+        createTournamentListItem(t, type) { const el = document.createElement('div'); el.id = `t-${type}-${t.id}`; el.className = 'bg-gray-800 p-4 rounded-lg'; el.innerHTML = `<h4 class="font-bold text-lg">${t.name} <span class="text-xs capitalize text-indigo-400">(${type})</span></h4><p class="text-sm text-gray-400">Registered: ${t.registeredCount || 0}/${t.maxPlayers}</p><div class="mt-4 flex flex-wrap gap-2"><button data-id="${t.id}" data-type="${type}" class="edit-tournament-btn px-3 py-1 rounded bg-yellow-600 text-xs">Edit</button><button data-id="${t.id}" data-type="${type}" class="delete-tournament-btn px-3 py-1 rounded bg-red-600 text-xs">Delete</button><button data-id="${t.id}" data-type="${type}" class="publish-room-btn px-3 py-1 rounded bg-pink-600 text-xs">📢 Room</button><button data-id="${t.id}" data-type="${type}" class="view-players-btn px-3 py-1 rounded bg-blue-600 text-xs">Players</button><button data-id="${t.id}" data-type="${type}" class="chat-tournament-btn px-3 py-1 rounded bg-teal-600 text-xs">Chat</button><button data-id="${t.id}" data-type="${type}" class="post-result-btn px-3 py-1 rounded bg-green-500 text-xs">Result Img</button><button data-id="${t.id}" data-type="${type}" class="post-stats-btn px-3 py-1 rounded bg-green-600 text-xs">Post Stats</button><button data-id="${t.id}" data-type="${type}" class="manage-qualify-btn px-3 py-1 rounded bg-purple-600 text-xs">Qualify</button></div>`; return el; }
+        openTournamentModal(data = null, type = 'solo') { const isEdit = !!data; const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = ` <h3 class="text-xl font-bold">${isEdit ? 'Edit' : 'Create'} Tournament</h3> <form id="tournamentForm" class="space-y-3 overflow-y-auto max-h-[60vh] p-2"> <div><label>Type</label><select id="tType" class="w-full p-2 bg-gray-700 rounded-md" ${isEdit ? 'disabled' : ''}>${['solo','duo','squad'].map(o => `<option value="${o}" ${o===type ? 'selected':''}>${o.toUpperCase()}</option>`).join('')}</select></div> <div><label>Name</label><input id="tName" type="text" required class="w-full p-2 bg-gray-700 rounded-md" value="${data?.name || ''}"></div> <div><label>Banner URL</label><input id="tBanner" type="url" required class="w-full p-2 bg-gray-700 rounded-md" value="${data?.bannerUrl || ''}"></div><div class="grid grid-cols-2 gap-4"><div><label>Format</label><select id="tFormat" class="w-full p-2 bg-gray-700 rounded-md">${['Classic', 'Knockout', 'League'].map(o => `<option value="${o}" ${o===data?.format?'selected':''}>${o}</option>`).join('')}</select></div><div><label>Status</label><select id="tStatus" class="w-full p-2 bg-gray-700 rounded-md"><option value="upcoming" ${data?.status==='upcoming'?'selected':''}>Upcoming</option><option value="live" ${data?.status==='live'?'selected':''}>Live</option><option value="finished" ${data?.status==='finished'?'selected':''}>Finished</option></select></div></div><div class="grid grid-cols-2 gap-4"><div><label>Prize (?)</label><input id="tPrize" type="number" required class="w-full p-2 bg-gray-700 rounded-md" value="${data?.prize || ''}"></div><div><label>Fee (?)</label><input id="tFee" type="number" required class="w-full p-2 bg-gray-700 rounded-md" value="${data?.entryFee || 0}"></div></div> <div class="grid grid-cols-2 gap-4"><div><label>Max Slots</label><input id="tSlots" type="number" required class="w-full p-2 bg-gray-700 rounded-md" value="${data?.maxPlayers || ''}"></div></div> <div><label>Live Stream URL (Optional)</label><input id="tStream" type="url" class="w-full p-2 bg-gray-700 rounded-md" value="${data?.liveStreamUrl || ''}"></div><div><label>Bracket URL (Optional)</label><input id="tBracket" type="url" class="w-full p-2 bg-gray-700 rounded-md" value="${data?.bracketUrl || ''}"></div><div><label>Details</label><textarea id="tDetails" rows="3" class="w-full p-2 bg-gray-700 rounded-md">${data?.details || ''}</textarea></div> <div><label>Notice</label><textarea id="tNotice" rows="2" class="w-full p-2 bg-gray-700 rounded-md">${data?.notice || ''}</textarea></div> <div class="flex justify-end gap-4 pt-4"><button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">Cancel</button><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save</button></div> </form> `; document.getElementById('tournamentForm').addEventListener('submit', e => { e.preventDefault(); this.handleTournamentSubmit(data?.id, document.getElementById('tType').value); }); this.toggleModal(true); }
+        
+        async handleTournamentSubmit(id, type) { 
+            const tData = { name: document.getElementById('tName').value, bannerUrl: document.getElementById('tBanner').value, prize: Number(document.getElementById('tPrize').value), entryFee: Number(document.getElementById('tFee').value), maxPlayers: Number(document.getElementById('tSlots').value), status: document.getElementById('tStatus').value, format: document.getElementById('tFormat').value, liveStreamUrl: document.getElementById('tStream').value, bracketUrl: document.getElementById('tBracket').value, details: document.getElementById('tDetails').value, notice: document.getElementById('tNotice').value }; 
+            if (id) { 
+                await updateDoc(doc(db, 'tournaments', type, 'items', id), tData); 
+                this.sendNotificationToAll("Tournament Updated", `Update: ${tData.name}`);
+            } else { 
+                tData.createdAt = serverTimestamp(); tData.registeredCount = 0; tData.registrations = {}; await addDoc(collection(db, 'tournaments', type, 'items'), tData); 
+                this.sendNotificationToAll("New Tournament", `Join ${tData.name} now!`);
+            } 
+            alert(`Tournament ${id ? 'Updated' : 'Created'}!`); this.closeModal(); 
+        }
+
+        async viewTournamentPlayers(tournament, type) { const registrations = tournament.registrations || {}; let playersInfo = []; if(type === 'solo') { const userIds = Object.keys(registrations); const userDocs = await Promise.all(userIds.map(id => getDoc(doc(db, 'users', id)))); playersInfo = userDocs.map(d => d.exists() ? { id: d.id, ...d.data() } : null).filter(Boolean); } else if (type === 'duo' || type === 'squad') { const teamIds = Object.keys(registrations); const collectionName = type === 'duo' ? 'partners' : 'squads'; const teamDocs = await Promise.all(teamIds.map(id => getDoc(doc(db, collectionName, id)))); for(const teamDoc of teamDocs) { if(teamDoc.exists()) { const teamData = teamDoc.data(); const memberDocs = await Promise.all(teamData.members.map(id => getDoc(doc(db, 'users', id)))); const members = memberDocs.map(d => d.data()); playersInfo.push({ id: teamDoc.id, teamName: teamData.name, members }); } } } const modalContent = document.getElementById('modalContent'); let contentHtml = ''; if (type === 'solo') { const tableBody = playersInfo.length > 0 ? playersInfo.map(p => `<tr><td class="p-2 border border-gray-600">${p.username}</td><td class="p-2 border border-gray-600">${p.ingameName}</td><td class="p-2 border border-gray-600">${p.ingameUID}</td></tr>`).join('') : '<tr><td colspan="3" class="p-4 text-center">No players registered.</td></tr>'; contentHtml = `<table class="w-full text-sm text-left border-collapse"><thead class="bg-gray-700"><tr><th class="p-2 border border-gray-600">Username</th><th class="p-2 border border-gray-600">IGN</th><th class="p-2 border border-gray-600">UID</th></tr></thead><tbody>${tableBody}</tbody></table>`; } else { contentHtml = playersInfo.length > 0 ? playersInfo.map(team => `<div class="mb-4"><h4 class="font-bold bg-gray-700 p-2 rounded-t-lg">${team.teamName}</h4><table class="w-full text-sm text-left border-collapse"><tbody>${team.members.map(m => `<tr><td class="p-2 border border-gray-600">${m.ingameName}</td><td class="p-2 border border-gray-600">${m.ingameUID}</td></tr>`).join('')}</tbody></table></div>`).join('') : '<p class="text-center">No teams registered.</p>'; } modalContent.innerHTML = `<h3 class="text-xl font-bold">Registered Players</h3><div class="overflow-y-auto max-h-[60vh] mt-4">${contentHtml}</div><div class="text-right mt-4"><button class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">Close</button></div>`; this.toggleModal(true); }
+        openTournamentChat(type, id, qualifyGroupId = null, groupName = null) { this.currentAdminChatContext = { type, id, qualifyGroupId }; const chatId = qualifyGroupId ? `qualify_${qualifyGroupId}` : `${type}_${id}`; const title = qualifyGroupId ? `Qualify Chat: ${groupName}` : 'Tournament Chat'; const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = `<h3 class="text-xl font-bold">${title}</h3><div id="adminChatContainer" class="h-80 overflow-y-auto bg-gray-900 p-2 my-2 rounded flex flex-col gap-2">Loading...</div><div class="flex flex-col gap-2 mt-2 border-t border-gray-700 pt-4"><input type="text" id="adminChatMessageInput" class="w-full p-2 bg-gray-700 rounded-md" placeholder="Send message as Admin..."><input type="url" id="adminChatImageInput" class="w-full p-2 bg-gray-700 rounded-md" placeholder="Or paste an image URL..."><button id="adminChatSendBtn" class="w-full px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 mt-2">Send</button></div><div class="text-right mt-4"><button class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">Close</button></div>`; this.toggleModal(true); const chatContainer = document.getElementById('adminChatContainer'); const q = query(collection(db, 'chats', chatId, 'messages'), orderBy('timestamp', 'asc')); this.chatUnsubscribe = onSnapshot(q, snap => { chatContainer.innerHTML = snap.empty ? '<p class="p-4 text-center text-sm text-gray-400">No messages yet.</p>' : ''; snap.forEach(doc => { const msg = doc.data(); const el = document.createElement('div'); const textContent = msg.text.replace(/\[img\](https?:\/\/[^\s]+)\[\/img\]/g, `<img src="$1" class="rounded-lg mt-2 max-w-full" alt="Image from chat">`); el.className = `p-2 rounded-lg max-w-[80%] chat-message-text ${msg.senderId === 'system' ? 'bg-yellow-800 self-center text-xs' : (msg.senderName === 'Admin' ? 'bg-indigo-600 self-end' : 'bg-gray-700 self-start')}`; el.innerHTML = `<div class="font-bold text-xs">${msg.senderName}</div><div>${textContent}</div>`; chatContainer.appendChild(el); }); if (chatContainer.children.length > 0) chatContainer.lastElementChild.scrollIntoView(); }); }
+        async handleAdminSendMessage() { const input = document.getElementById('adminChatMessageInput'); const imgInput = document.getElementById('adminChatImageInput'); const text = input.value.trim(); const imageUrl = imgInput.value.trim(); if (!text && !imageUrl || !this.currentAdminChatContext) return; input.value = ''; imgInput.value = ''; let messageText = text; if(imageUrl) { messageText += `\n[img]${imageUrl}[/img]`; } const { type, id, qualifyGroupId } = this.currentAdminChatContext; const chatId = qualifyGroupId ? `qualify_${qualifyGroupId}` : `${type}_${id}`; const messageData = { text: messageText, senderId: auth.currentUser.uid, senderName: 'Admin', timestamp: serverTimestamp() }; await addDoc(collection(db, 'chats', chatId, 'messages'), messageData); }
+        openResultModal(id, type) { const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = `<h3 class="text-xl font-bold">Post Match Result</h3><form id="resultForm" class="space-y-4"><input type="text" id="resultTitle" placeholder="Title (e.g., Final Match)" required class="w-full p-2 bg-gray-700 rounded-md"><input type="url" id="resultUrl" placeholder="Image URL of results" required class="w-full p-2 bg-gray-700 rounded-md"><div class="flex justify-end gap-4 pt-4"><button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md">Post</button></div></form>`; document.getElementById('resultForm').addEventListener('submit', async e => { e.preventDefault(); const result = { title: document.getElementById('resultTitle').value, imageUrl: document.getElementById('resultUrl').value, createdAt: serverTimestamp() }; await updateDoc(doc(db, 'tournaments', type, 'items', id), { results: arrayUnion(result) }); alert('Result posted!'); this.closeModal(); }); this.toggleModal(true); }
+        async openPostStatsModal(tournament, type) {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `<div class="text-center">Loading registered players...</div>`;
+            this.toggleModal(true);
+            const registrations = tournament.registrations || {};
+            let participants = [];
+            const userIds = [];
+            if (type === 'solo') {
+                userIds.push(...Object.keys(registrations));
+            } else {
+                const teamIds = Object.keys(registrations);
+                const collectionName = type === 'duo' ? 'partners' : 'squads';
+                const teamDocs = await Promise.all(teamIds.map(id => getDoc(doc(db, collectionName, id))));
+                teamDocs.forEach(d => { if(d.exists()) userIds.push(...d.data().members); });
+            }
+            
+            const uniqueUserIds = [...new Set(userIds)];
+            const userDocs = await Promise.all(uniqueUserIds.map(id => getDoc(doc(db, 'users', id))));
+            participants = userDocs.map(d => d.exists() ? { id: d.id, ...d.data() } : null).filter(Boolean);
+
+            let participantsHtml = participants.map(p => `
+                <tr class="border-b border-gray-700" data-user-id="${p.id}">
+                    <td class="p-2">${p.username}</td>
+                    <td><input type="number" class="w-20 p-1 bg-gray-600 rounded result-rank" placeholder="Rank"></td>
+                    <td><input type="number" class="w-20 p-1 bg-gray-600 rounded result-kills" placeholder="Kills"></td>
+                </tr>
+            `).join('');
+
+            modalContent.innerHTML = `<h3 class="text-xl font-bold">Post Stats for ${tournament.name}</h3>
+                <form id="statsForm" class="mt-4"><div class="overflow-y-auto max-h-80">
+                <table class="w-full text-sm"><thead><tr class="text-left"><th class="p-2">Player</th><th class="p-2">Rank</th><th class="p-2">Kills</th></tr></thead>
+                <tbody>${participantsHtml}</tbody></table></div>
+                <div class="flex justify-end gap-4 pt-4 mt-4 border-t border-gray-600">
+                    <button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md">Cancel</button>
+                    <button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md">Submit & Distribute Points</button>
+                </div></form>`;
+            
+            document.getElementById('statsForm').addEventListener('submit', e => {
+                e.preventDefault();
+                this.handleResultsSubmit(tournament.id, type);
+            });
+        }
+        async handleResultsSubmit(tournamentId, type) {
+            const batch = writeBatch(db);
+            const formRows = document.querySelectorAll('#statsForm tbody tr');
+            const playerPromises = [];
+
+            for (const row of formRows) {
+                const userId = row.dataset.userId;
+                const rank = parseInt(row.querySelector('.result-rank').value) || 0;
+                const kills = parseInt(row.querySelector('.result-kills').value) || 0;
+                
+                if (rank === 0) continue; 
+
+                playerPromises.push(async () => {
+                    const userRef = doc(db, 'users', userId);
+                    const userDoc = await getDoc(userRef);
+                    if (!userDoc.exists()) return;
+                    
+                    const userData = userDoc.data();
+                    const stats = userData.stats || { played: 0, won: 0 };
+                    
+                    const rankPoints = rank > 0 ? Math.floor(100 / rank) : 0; 
+                    const killPoints = kills * 5; 
+                    const totalPoints = rankPoints + killPoints;
+                    
+                    batch.update(userRef, {
+                        'stats.played': increment(1),
+                        'stats.won': increment(rank === 1 ? 1 : 0),
+                        ratingPoints: increment(totalPoints)
+                    });
+
+                    const newAchievements = userData.achievements || [];
+                    if (rank === 1 && !newAchievements.includes('first_blood') && stats.won === 0) newAchievements.push('first_blood');
+                    if (stats.played + 1 >= 50 && !newAchievements.includes('veteran')) newAchievements.push('veteran');
+                    if (kills >= 10 && !newAchievements.includes('headshot_master')) newAchievements.push('headshot_master');
+                    batch.update(userRef, { achievements: newAchievements });
+                });
+            }
+
+            await Promise.all(playerPromises.map(p => p()));
+            batch.update(doc(db, 'tournaments', type, 'items', tournamentId), { status: 'finished' });
+            await batch.commit();
+            alert('Stats and points distributed successfully!');
+            this.closeModal();
+        }
+        async openQualifyModal(tournament, type) { const modalContent = document.getElementById('modalContent'); modalContent.innerHTML = `<div class="text-center">Loading...</div>`; this.toggleModal(true); const registrations = tournament.registrations || {}; let participants = []; if (type === 'solo') { const userIds = Object.keys(registrations); const userDocs = await Promise.all(userIds.map(id => getDoc(doc(db, 'users', id)))); participants = userDocs.map(d => d.exists() ? { id: d.id, name: d.data().username } : null).filter(Boolean); } else { const teamIds = Object.keys(registrations); const collectionName = type === 'duo' ? 'partners' : 'squads'; const teamDocs = await Promise.all(teamIds.map(id => getDoc(doc(db, collectionName, id)))); participants = teamDocs.map(d => d.exists() ? { id: d.id, name: d.data().name } : null).filter(Boolean); } const qualifyGroupsRef = collection(db, `tournaments/${type}/items/${tournament.id}/qualifyGroups`); const groupsSnapshot = await getDocs(qualifyGroupsRef); const existingGroups = groupsSnapshot.docs.map(d => ({id: d.id, ...d.data()})); const existingGroupsHtml = existingGroups.map(g => `<div class="bg-gray-700 p-2 rounded flex justify-between items-center"><span>${g.name}</span><button class="open-qualify-chat-btn text-xs px-2 py-1 bg-teal-600 rounded" data-group-id="${g.id}" data-group-name="${g.name}">Chat</button></div>`).join(''); modalContent.innerHTML = `<h3 class="text-xl font-bold">Manage Qualify Groups</h3><div class="my-4 space-y-2"><h4 class="font-semibold text-sm">Existing Groups</h4>${existingGroupsHtml || `<p class="text-xs text-gray-400">No groups created yet.</p>`}</div><form id="qualifyForm" class="space-y-3 border-t border-gray-700 pt-4"><h4 class="font-semibold text-sm">Create New Group</h4><input type="text" id="qualifyName" placeholder="Group Name" required class="w-full p-2 bg-gray-700 rounded-md"><div class="max-h-40 overflow-y-auto border border-gray-700 rounded p-2 space-y-2">${participants.map(p => `<label class="flex items-center gap-3"><input type="checkbox" value="${p.id}" class="form-checkbox bg-gray-900 border-gray-600 text-indigo-500"><span>${p.name}</span></label>`).join('')}</div><div class="flex justify-end gap-4 pt-4"><button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md">Cancel</button><button type="submit" class="px-4 py-2 font-semibold text-white bg-indigo-600 rounded-md">Create Group</button></div></form>`; document.querySelectorAll('.open-qualify-chat-btn').forEach(btn => btn.addEventListener('click', () => this.openTournamentChat(type, tournament.id, btn.dataset.groupId, btn.dataset.groupName))); document.getElementById('qualifyForm').addEventListener('submit', async e => { e.preventDefault(); const name = document.getElementById('qualifyName').value; const members = Array.from(document.querySelectorAll('#qualifyForm input:checked')).map(cb => cb.value); if (!name || members.length === 0) { alert('Please provide a name and select members.'); return; } await addDoc(qualifyGroupsRef, { name, members, createdAt: serverTimestamp() }); alert('Group created!'); this.closeModal(); }); }
+        
+        openPublishRoomModal(tournament, type) {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <h3 class="text-xl font-bold">Publish Room Details</h3>
+                <p class="text-sm text-gray-400 mb-4">Players will receive a push notification.</p>
+                <form id="publishRoomForm" class="space-y-4">
+                    <input type="text" id="roomId" placeholder="Room ID" required class="w-full p-2 bg-gray-700 rounded-md" value="${tournament.roomId || ''}">
+                    <input type="text" id="roomPass" placeholder="Password" required class="w-full p-2 bg-gray-700 rounded-md" value="${tournament.roomPass || ''}">
+                    <div class="flex justify-end gap-4 pt-4">
+                        <button type="button" class="close-modal-btn px-4 py-2 font-semibold text-white bg-gray-600 rounded-md">Cancel</button>
+                        <button type="submit" class="px-4 py-2 font-semibold text-white bg-pink-600 rounded-md">Publish & Notify</button>
+                    </div>
+                </form>
+            `;
+            document.getElementById('publishRoomForm').addEventListener('submit', e => {
+                e.preventDefault();
+                this.handlePublishRoom(tournament, type);
+            });
+            this.toggleModal(true);
+        }
+
+        async handlePublishRoom(tournament, type) {
+            const roomId = document.getElementById('roomId').value;
+            const roomPass = document.getElementById('roomPass').value;
+            
+            await updateDoc(doc(db, 'tournaments', type, 'items', tournament.id), {
+                roomId: roomId,
+                roomPass: roomPass,
+                roomUpdatedAt: serverTimestamp()
+            });
+
+            const registrations = tournament.registrations || {};
+            const userIds = [];
+
+            if (type === 'solo') {
+                userIds.push(...Object.keys(registrations));
+            } else {
+                const teamIds = Object.keys(registrations);
+                const collectionName = type === 'duo' ? 'partners' : 'squads';
+                const teamDocs = await Promise.all(teamIds.map(id => getDoc(doc(db, collectionName, id))));
+                teamDocs.forEach(d => { if(d.exists()) userIds.push(...d.data().members); });
+            }
+
+            const uniqueUserIds = [...new Set(userIds)];
+            
+            const notifIds = [];
+            const userDocs = await Promise.all(uniqueUserIds.map(id => getDoc(doc(db, 'users', id))));
+            userDocs.forEach(d => {
+                if(d.exists() && d.data().notificationId) {
+                    notifIds.push(d.data().notificationId);
+                }
+            });
+
+            if(notifIds.length > 0) {
+                this.sendNotification(notifIds, "Room ID Published!", `Room: ${roomId}, Pass: ${roomPass}. Join Now!`);
+                alert(`Room published & sent to ${notifIds.length} players!`);
+            } else {
+                alert("Room published, but no registered players have notifications enabled.");
+            }
+            this.closeModal();
+        }
+
+        toggleModal(show) { document.getElementById('formModal').classList.toggle('hidden', !show); }
+        closeModal() { if (this.chatUnsubscribe) { this.chatUnsubscribe(); this.chatUnsubscribe = null; } this.currentAdminChatContext = null; document.getElementById('formModal').classList.add('hidden'); }
+        showContent(contentId) { document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden')); document.getElementById(contentId).classList.remove('hidden'); document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active-link')); document.querySelector(`[data-content="${contentId}"]`).classList.add('active-link'); this.currentContent = contentId; if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full'); }
+      }
+
+      new AdminApp();
+    </script>
+</body>
+</html>
